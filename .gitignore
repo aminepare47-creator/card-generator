@@ -1,0 +1,25 @@
+
+# User-uploaded images (served from /public, regenerated each deploy)
+public/uploads/
+
+data/
+.data/
+*.db
+*.db-wal
+*.db-shm
+node_modules
+
+# Next.js build output
+.next/
+out/
+
+# Environment secrets
+.env
+.env.local
+.env*.local
+
+# TypeScript incremental build
+*.tsbuildinfo
+
+# Logs
+*.log
