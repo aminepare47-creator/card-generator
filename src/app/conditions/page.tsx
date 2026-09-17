@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Conditions d'utilisation · Carte Pro",
-  description: "Les conditions d'utilisation du service Carte Pro.",
+  title: "Conditions d'utilisation · MyCard",
+  description: "Les conditions d'utilisation du service MyCard.",
 };
 
 export default function ConditionsPage() {
@@ -20,7 +20,7 @@ export default function ConditionsPage() {
       <section className="space-y-3 text-sm leading-relaxed text-slate-600">
         <h2 className="text-base font-semibold text-slate-900">1. Le service</h2>
         <p>
-          Carte Pro permet de créer, personnaliser et partager une carte de visite
+          MyCard permet de créer, personnaliser et partager une carte de visite
           numérique, gratuitement et sans création de compte. Le service est fourni
           « en l'état » et peut évoluer (nouvelles fonctionnalités, corrections,
           modifications des modèles).
@@ -53,7 +53,7 @@ export default function ConditionsPage() {
 
         <h2 className="text-base font-semibold text-slate-900">5. Limitation de responsabilité</h2>
         <p>
-          Carte Pro ne garantit pas une disponibilité ininterrompue du service et ne peut
+          MyCard ne garantit pas une disponibilité ininterrompue du service et ne peut
           être tenu responsable des pertes de données, des contenus publiés par les
           utilisateurs ni de l'usage qui en est fait par des tiers.
         </p>

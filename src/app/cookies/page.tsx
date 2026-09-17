@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cookies · Carte Pro",
-  description: "Les cookies utilisés par Carte Pro : un seul, strictement nécessaire.",
+  title: "Cookies · MyCard",
+  description: "Les cookies utilisés par MyCard : un seul, strictement nécessaire.",
 };
 
 export default function CookiesPage() {

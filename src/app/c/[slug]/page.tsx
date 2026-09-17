@@ -21,14 +21,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     await db.select().from(cards).where(eq(cards.slug, slug)).limit(1)
   )[0];
   if (!card) {
-    return { title: "Carte introuvable · Carte Pro" };
+    return { title: "Carte introuvable · MyCard" };
   }
   const title = `${card.name}${card.title ? " — " + card.title : ""}`;
   const description = card.company
     ? `${card.name}, ${card.title} chez ${card.company}. Carte de visite numérique.`
     : `${card.name}${card.title ? ", " + card.title : ""}. Carte de visite numérique.`;
   return {
-    title: `${title} · Carte Pro`,
+    title: `${title} · MyCard`,
     description,
     openGraph: {
       title,

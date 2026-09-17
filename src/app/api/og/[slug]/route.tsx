@@ -149,7 +149,8 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
               marginBottom: 12,
             }}
           >
-            Carte Pro
+            <span style={{ color: "#6366f1" }}>My</span>
+            <span style={{ color: isDark ? "#f1f5f9" : "#0f172a" }}>Card</span>
           </div>
           <div
             style={{

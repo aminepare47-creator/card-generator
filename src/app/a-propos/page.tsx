@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "À propos · Carte Pro",
-  description: "L'histoire de Carte Pro et sa mission : rendre la carte de visite numérique accessible à tous.",
+  title: "À propos · MyCard",
+  description: "L'histoire de MyCard et sa mission : rendre la carte de visite numérique accessible à tous.",
 };
 
 export default function AProposPage() {
@@ -12,12 +12,12 @@ export default function AProposPage() {
       <header>
         <p className="text-sm font-medium text-indigo-600">Qui sommes-nous</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-          À propos de Carte Pro
+          À propos de MyCard
         </h1>
       </header>
 
       <p className="text-sm leading-relaxed text-slate-600">
-        Carte Pro est né d'un constat simple : les cartes de visite papier se
+        MyCard est né d'un constat simple : les cartes de visite papier se
         perdent, se froissent et se jettent, et les solutions numériques
         existantes coûtent cher ou demandent un compte, un abonnement, une
         application à installer.

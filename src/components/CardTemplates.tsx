@@ -929,7 +929,7 @@ function PrestigeTemplate({ card, side }: TemplateProps) {
         </div>
       </div>
       <div className="absolute bottom-4 right-6 text-[10px] tracking-[0.2em] text-white/40">
-        {card.website ? card.website.replace(/^https?:\/\//, "").toUpperCase() : "CARTE PRO"}
+        {card.website ? card.website.replace(/^https?:\/\//, "").toUpperCase() : "MYCARD"}
       </div>
     </CardFace>
   );

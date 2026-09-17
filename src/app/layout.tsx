@@ -4,9 +4,10 @@ import Link from "next/link";
 import "./globals.css";
 import { I18nProvider, LocaleSwitcher } from "@/lib/i18n";
 import { CookieBanner } from "@/components/CookieBanner";
+import { Brand } from "@/components/Brand";
 
 export const metadata: Metadata = {
-  title: "Carte Pro — ta carte de visite numérique en 2 minutes",
+  title: "MyCard — ta carte de visite numérique en 2 minutes",
   description:
     "Crée une carte de visite professionnelle gratuite avec QR code, lien partageable et export vCard. Sans compte, sans paiement.",
 };
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   <path d="M3 12h18" />
                 </svg>
               </span>
-              <span>Carte Pro</span>
+              <Brand />
             </Link>
             <nav className="flex items-center gap-1 text-sm font-medium text-slate-600">
             <Link
@@ -88,7 +89,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </main>
         <footer className="border-t border-slate-200/80 bg-white">
           <div className="mx-auto flex w-full max-w-screen-2xl flex-col items-center gap-3 px-4 py-6 sm:flex-row sm:justify-between sm:px-6">
-            <p className="text-xs font-medium text-slate-500">Carte Pro</p>
+            <p className="text-xs font-medium text-slate-500">
+              <Brand />
+            </p>
             <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-slate-500">
               <Link href="/a-propos" className="transition hover:text-slate-900">
                 À propos

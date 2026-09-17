@@ -31,7 +31,7 @@ export function CookieBanner() {
     <div className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl sm:inset-x-6">
       <p className="text-sm font-semibold text-slate-900">🍪 Les cookies</p>
       <p className="mt-1 text-xs leading-relaxed text-slate-600">
-        Carte Pro n'utilise <strong>aucun cookie publicitaire ni de suivi</strong> — juste
+        MyCard n'utilise <strong>aucun cookie publicitaire ni de suivi</strong> — juste
         un cookie strictement nécessaire pour mémoriser tes cartes. Détails :{" "}
         <Link href="/cookies" className="font-medium text-indigo-600 underline">
           politique cookies

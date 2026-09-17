@@ -1,4 +1,4 @@
-# Carte Pro
+# MyCard
 
 > Une carte de visite numérique gratuite, sans compte, sans pub.
 > Lien public + QR code + export vCard + statistiques de scan, plus un générateur de QR code universel.

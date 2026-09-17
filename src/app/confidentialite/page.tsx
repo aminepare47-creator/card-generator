@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Confidentialité · Carte Pro",
-  description: "Comment Carte Pro collecte, utilise et protège tes données.",
+  title: "Confidentialité · MyCard",
+  description: "Comment MyCard collecte, utilise et protège tes données.",
 };
 
 export default function ConfidentialitePage() {
@@ -52,7 +52,7 @@ export default function ConfidentialitePage() {
 
         <h2 className="text-base font-semibold text-slate-900">6. Cookies</h2>
         <p>
-          Carte Pro n'utilise qu'un <strong>cookie strictement nécessaire</strong> (« Mes
+          MyCard n'utilise qu'un <strong>cookie strictement nécessaire</strong> (« Mes
           cartes ») et aucun cookie publicitaire ni de mesure d'audience tierce. Détails
           sur notre page{" "}
           <Link href="/cookies" className="font-medium text-indigo-600 underline">

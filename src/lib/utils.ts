@@ -1,4 +1,4 @@
-// Slug + token helpers + vCard generation utilities for Carte Pro.
+// Slug + token helpers + vCard generation utilities for MyCard.
 
 import type { CardRow } from "@/db/schema";
 
