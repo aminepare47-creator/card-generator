@@ -1,32 +1,28 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
-import fs from "node:fs";
-import path from "node:path";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 
-// SQLite file location (configurable via env, defaults to ./data/carte.db).
-const dbFile = process.env.DB_FILE_NAME?.trim()
-  ? path.resolve(process.env.DB_FILE_NAME.trim())
-  : path.join(process.cwd(), "data", "carte.db");
-
-// better-sqlite3 requires the parent directory to exist.
-fs.mkdirSync(path.dirname(dbFile), { recursive: true });
+// Postgres connection (Neon / Supabase / any Postgres provider).
+// The connection string comes from DATABASE_URL.
+const connectionString =
+  process.env.DATABASE_URL?.trim() ??
+  "postgresql://postgres:postgres@127.0.0.1:5432/app_db";
 
 const globalForDb = globalThis as typeof globalThis & {
-  __carteProSqlite?: InstanceType<typeof Database>;
+  __mycardPool?: Pool;
 };
 
-export const sqlite =
-  globalForDb.__carteProSqlite ??
-  new Database(dbFile, {
-    // WAL mode = better concurrency for a local Next.js app.
-    fileMustExist: false,
+export const pool =
+  globalForDb.__mycardPool ??
+  new Pool({
+    connectionString,
+    ssl: /supabase|neon|render|amazonaws/i.test(connectionString)
+      ? { rejectUnauthorized: false }
+      : undefined,
+    max: 5,
   });
 
-sqlite.pragma("journal_mode = WAL");
-sqlite.pragma("foreign_keys = ON");
-
 if (process.env.NODE_ENV !== "production") {
-  globalForDb.__carteProSqlite = sqlite;
+  globalForDb.__mycardPool = pool;
 }
 
-export const db = drizzle(sqlite);
+export const db = drizzle(pool);

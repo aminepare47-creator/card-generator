@@ -1,13 +1,22 @@
-// One-off script: creates the SQLite tables (idempotent).
-const Database = require("better-sqlite3");
-const fs = require("node:fs");
-const path = require("node:path");
+// One-off script: creates the Postgres tables (idempotent).
+// Usage: node scripts/init-db.cjs
+require("dotenv").config();
+const { Client } = require("pg");
 
-const dbPath = path.join(__dirname, "..", "data", "carte.db");
-fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-const db = new Database(dbPath);
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error("DATABASE_URL manquant (voir .env.example).");
+  process.exit(1);
+}
 
-db.exec(`
+const client = new Client({
+  connectionString,
+  ssl: /supabase|neon|render|amazonaws/i.test(connectionString)
+    ? { rejectUnauthorized: false }
+    : undefined,
+});
+
+const DDL = `
 CREATE TABLE IF NOT EXISTS cards (
   slug TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -22,22 +31,37 @@ CREATE TABLE IF NOT EXISTS cards (
   facebook TEXT,
   instagram TEXT,
   theme TEXT NOT NULL DEFAULT 'indigo',
-  template TEXT NOT NULL DEFAULT 'classique',
+  template TEXT NOT NULL DEFAULT 'halo',
   photo_url TEXT,
+  logo_url TEXT,
+  products TEXT,
+  bio TEXT,
+  custom_color TEXT,
+  font_family TEXT,
+  photo_shape TEXT,
+  name_size TEXT,
   edit_token TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS cards_slug_idx ON cards(slug);
+
 CREATE TABLE IF NOT EXISTS card_scans (
   slug TEXT NOT NULL,
   day TEXT NOT NULL,
   count INTEGER NOT NULL DEFAULT 0,
-  last_seen_at INTEGER NOT NULL,
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (slug, day)
 );
 CREATE INDEX IF NOT EXISTS card_scans_slug_idx ON card_scans(slug);
-`);
+`;
 
-console.log("TABLES_OK");
-db.close();
+(async () => {
+  await client.connect();
+  await client.query(DDL);
+  console.log("TABLES_OK");
+  await client.end();
+})().catch((err) => {
+  console.error("Erreur:", err.message);
+  process.exit(1);
+});

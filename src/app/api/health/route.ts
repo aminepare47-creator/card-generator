@@ -5,8 +5,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // better-sqlite3 driver: `all()` returns rows synchronously.
-    await db.all(sql`select 1`);
+    // node-postgres driver: `execute()` returns the result asynchronously.
+    await db.execute(sql`select 1`);
     return Response.json({ ok: true });
   } catch {
     return Response.json({ ok: false }, { status: 500 });

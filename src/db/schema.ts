@@ -1,17 +1,18 @@
-import {
-  sqliteTable,
+﻿import {
+  pgTable,
   text,
   integer,
+  timestamp,
   index,
   primaryKey,
-} from "drizzle-orm/sqlite-core";
+} from "drizzle-orm/pg-core";
 
-// SQLite stores timestamps as integer ms; mode "timestamp_ms" gives us Date
-// objects back, so the rest of the app keeps working unchanged.
+// Postgres keeps real timestamps; mode "date" gives us Date objects back, so
+// the rest of the app keeps working unchanged.
 const tsMs = (name: string) =>
-  integer(name, { mode: "timestamp_ms" }).$defaultFn(() => new Date());
+  timestamp(name, { mode: "date", withTimezone: true }).notNull().defaultNow();
 
-export const cards = sqliteTable(
+export const cards = pgTable(
   "cards",
   {
     slug: text("slug").primaryKey(),
@@ -32,17 +33,17 @@ export const cards = sqliteTable(
     logoUrl: text("logo_url"),
     // Products gallery: JSON array of {name, description, price, imageUrl}.
     products: text("products"),
-    // "À propos" shown with the contacts on the verso.
+    // "A propos" shown with the contacts on the verso.
     bio: text("bio"),
     // Customization: hex color override (#rrggbb), font choice, photo shape
-    // and display-name size. All optional — empty keeps the theme defaults.
+    // and display-name size. All optional - empty keeps the theme defaults.
     customColor: text("custom_color"),
     fontFamily: text("font_family"),
     photoShape: text("photo_shape"),
     nameSize: text("name_size"),
     editToken: text("edit_token").notNull(),
-    createdAt: tsMs("created_at").notNull(),
-    updatedAt: tsMs("updated_at").notNull(),
+    createdAt: tsMs("created_at"),
+    updatedAt: tsMs("updated_at"),
   },
   (table) => ({
     slugIdx: index("cards_slug_idx").on(table.slug),
@@ -51,13 +52,13 @@ export const cards = sqliteTable(
 
 // Daily counters per card. One row per (slug, day); composite primary key
 // gives us idempotent upserts (onConflictDoUpdate) and fast range queries.
-export const cardScans = sqliteTable(
+export const cardScans = pgTable(
   "card_scans",
   {
     slug: text("slug").notNull(),
     day: text("day").notNull(), // YYYY-MM-DD
     count: integer("count").notNull().default(0),
-    lastSeenAt: tsMs("last_seen_at").notNull(),
+    lastSeenAt: tsMs("last_seen_at"),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.slug, table.day] }),

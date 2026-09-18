@@ -1,32 +1,43 @@
-const Database = require("better-sqlite3");
-const path = require("path");
-const db = new Database(path.join(__dirname, "..", "data", "carte.db"));
+// One-off script: ensures every column added after the first release exists
+// (idempotent). Usage: node scripts/migrate-logo-products.cjs
+require("dotenv").config();
+const { Client } = require("pg");
 
-const cols = db.prepare("PRAGMA table_info(cards)").all().map((c) => c.name);
-console.log("Existing columns:", cols.join(", "));
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error("DATABASE_URL manquant (voir .env.example).");
+  process.exit(1);
+}
 
-function addCol(name, ddl) {
-  if (!cols.includes(name)) {
-    db.prepare(`ALTER TABLE cards ADD COLUMN ${ddl}`).run();
-    console.log("Added:", ddl);
-  } else {
-    console.log("Already present:", name);
+const client = new Client({
+  connectionString,
+  ssl: /supabase|neon|render|amazonaws/i.test(connectionString)
+    ? { rejectUnauthorized: false }
+    : undefined,
+});
+
+const COLUMNS = [
+  ["logo_url", "TEXT"],
+  ["products", "TEXT"],
+  ["bio", "TEXT"],
+  ["custom_color", "TEXT"],
+  ["font_family", "TEXT"],
+  ["photo_shape", "TEXT"],
+  ["name_size", "TEXT"],
+];
+
+(async () => {
+  await client.connect();
+  await client.query(
+    `ALTER TABLE cards ALTER COLUMN template SET DEFAULT 'halo'`
+  );
+  for (const [name, type] of COLUMNS) {
+    await client.query(`ALTER TABLE cards ADD COLUMN IF NOT EXISTS ${name} ${type}`);
+    console.log("OK:", name);
   }
-}
-
-addCol("logo_url", `"logo_url" text`);
-addCol("products", `"products" text`);
-addCol("bio", `"bio" text`);
-addCol("custom_color", `"custom_color" text`);
-addCol("font_family", `"font_family" text`);
-addCol("photo_shape", `"photo_shape" text`);
-addCol("name_size", `"name_size" text`);
-
-try {
-  db.prepare(`ALTER TABLE cards ALTER COLUMN "template" SET DEFAULT 'halo'`).run();
-  console.log("Default template -> halo");
-} catch (e) {
-  console.log("Default not changed (SQLite < 3.35?):", e.message);
-}
-
-console.log("Done.");
+  console.log("Done.");
+  await client.end();
+})().catch((err) => {
+  console.error("Erreur:", err.message);
+  process.exit(1);
+});

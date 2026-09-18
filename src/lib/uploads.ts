@@ -1,13 +1,17 @@
-// On-disk storage for user uploads. Files live in DATA_DIR (configurable via
-// env, defaulting to a `.data/uploads` folder at the project root). They are
-// served by the `/api/uploads/[file]` route handler — Next.js production
-// builds don't pick up files added to `public/` after the build, so serving
-// them via a route is the most portable approach.
+// Storage for user uploads. Images are re-encoded through sharp and then
+// written to Supabase Storage when SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are
+// set — that's the production path, because it survives redeploys. Without
+// those two variables we fall back to a local folder (`.data/uploads` by
+// default, or UPLOAD_DIR), which is handy for development.
+// Files are served by the `/api/uploads/[file]` route handler: Next.js
+// production builds don't pick up files added to `public/` after the build, so
+// serving them through a route is the most portable approach.
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import sharp from "sharp";
+import { STORAGE_BUCKET, getSupabaseStorage } from "@/lib/storage";
 
 export const MAX_UPLOAD_BYTES = 6 * 1024 * 1024; // 6 MB
 
@@ -94,7 +98,6 @@ export async function saveUpload(
   buffer: Buffer,
   ext: string,
 ): Promise<{ filename: string; finalExt: string; mime: string; size: number }> {
-  const dir = await ensureUploadDir();
   const id = crypto.randomBytes(12).toString("hex");
 
   // Re-encode + resize through sharp. This strips EXIF metadata, normalises
@@ -139,6 +142,25 @@ export async function saveUpload(
   }
 
   const filename = `${Date.now().toString(36)}-${id}.${finalExt}`;
+
+  // Preferred path: Supabase Storage (persistent across redeploys, free tier).
+  const supabase = getSupabaseStorage();
+  if (supabase) {
+    const { error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(filename, outBuffer, {
+        contentType: mime,
+        upsert: true,
+        cacheControl: "3600",
+      });
+    if (error) {
+      throw new Error(`Échec de l'envoi vers le stockage : ${error.message}`);
+    }
+    return { filename, finalExt, mime, size: outBuffer.length };
+  }
+
+  // Fallback (local dev without Supabase): write to the on-disk folder.
+  const dir = await ensureUploadDir();
   const targetPath = path.join(dir, filename);
   const resolved = path.resolve(targetPath);
   if (!resolved.startsWith(path.resolve(dir) + path.sep)) {
@@ -161,7 +183,6 @@ function isGifAnimated(buffer: Buffer): boolean {
 }
 
 export async function readUpload(filename: string): Promise<Buffer | null> {
-  const dir = getUploadDir();
   // Defense-in-depth: reject any path traversal.
   if (
     !filename ||
@@ -172,6 +193,19 @@ export async function readUpload(filename: string): Promise<Buffer | null> {
     return null;
   }
   if (!/^[A-Za-z0-9._-]+$/.test(filename)) return null;
+
+  // Preferred path: Supabase Storage.
+  const supabase = getSupabaseStorage();
+  if (supabase) {
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .download(filename);
+    if (error || !data) return null;
+    return Buffer.from(await data.arrayBuffer());
+  }
+
+  // Fallback (local dev): read from the on-disk folder.
+  const dir = getUploadDir();
   const target = path.join(dir, filename);
   const resolved = path.resolve(target);
   if (!resolved.startsWith(path.resolve(dir) + path.sep)) return null;
