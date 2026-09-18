@@ -1,0 +1,2 @@
+# Garde le dossier `public/` dans le repo : Next.js et le Dockerfile s'attendent
+# à ce qu'il existe (assets statiques : favicon, images…).
